@@ -95,8 +95,10 @@ def ensure_section_chart_columns():
 
 
 def seed_demo_dashboard(db):
-    admin = db.query(User).filter(User.role == "admin").order_by(User.id).first()
-    if not admin:
+    owner = db.query(User).filter(User.role == "admin").order_by(User.id).first()
+    if not owner:
+        owner = db.query(User).order_by(User.id).first()
+    if not owner:
         return
 
     dashboard = db.query(Dashboard).filter(Dashboard.name == "Executive Overview").first()
@@ -104,17 +106,10 @@ def seed_demo_dashboard(db):
         dashboard = Dashboard(
             name="Executive Overview",
             description="High-level overview of key business metrics.",
-            owner_id=admin.id,
+            owner_id=owner.id,
         )
         db.add(dashboard)
         db.flush()
-
-    existing_sections = db.query(Section).filter(Section.dashboard_id.is_(None)).all()
-    if existing_sections:
-        for section in existing_sections:
-            section.dashboard_id = dashboard.id
-        db.commit()
-        return
 
     demo_sections = {
         "Sales Overview": ("line", "$1.28M", "+18.4% vs prior period", ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], [820, 910, 860, 1040, 1120, 1280]),
@@ -125,25 +120,12 @@ def seed_demo_dashboard(db):
         "Finance KPIs": ("bar", "38.2%", "Operating margin", ["Operating margin", "Gross margin", "EBITDA", "Cash reserve"], [38, 62, 29, 71]),
     }
 
-    for section in db.query(Section).filter(Section.dashboard_id == dashboard.id).all():
-        if section.name in demo_sections:
-            chart_type, headline, change, labels, values = demo_sections[section.name]
-            section.chart_type = chart_type
-            section.chart_headline = headline
-            section.chart_change = change
-            section.chart_labels = labels
-            section.chart_values = values
+    existing_names = {section.name for section in db.query(Section).filter(Section.dashboard_id == dashboard.id).all()}
+    for name, (chart_type, headline, change, labels, values) in demo_sections.items():
+        if name not in existing_names:
+            db.add(Section(dashboard_id=dashboard.id, name=name, chart_type=chart_type, chart_headline=headline, chart_change=change, chart_labels=labels, chart_values=values))
     db.commit()
 
-    if db.query(Section).filter(Section.dashboard_id == dashboard.id).count() == 0:
-        db.add_all(
-            [
-                Section(dashboard_id=dashboard.id, name="Sales Overview", chart_type="line", chart_headline="$1.28M", chart_change="+18.4% vs prior period", chart_labels=["Jan", "Feb", "Mar", "Apr", "May", "Jun"], chart_values=[820, 910, 860, 1040, 1120, 1280]),
-                Section(dashboard_id=dashboard.id, name="Customer Retention", chart_type="bar", chart_headline="92.4%", chart_change="+3.1 pts quarter over quarter", chart_labels=["Enterprise", "Mid-market", "Small business", "Self-service"], chart_values=[96, 93, 89, 84]),
-                Section(dashboard_id=dashboard.id, name="Revenue by Region", chart_type="pie", chart_headline="$1.28M", chart_change="Top region: North America", chart_labels=["North America", "Europe", "Asia Pacific", "Latin America"], chart_values=[520, 310, 270, 180]),
-                Section(dashboard_id=dashboard.id, name="Marketing Trend", chart_type="line", chart_headline="42.8K", chart_change="+24.6% qualified leads", chart_labels=["Jan", "Feb", "Mar", "Apr", "May", "Jun"], chart_values=[24, 27, 31, 29, 38, 43]),
-                Section(dashboard_id=dashboard.id, name="Revenue Growth", chart_type="bar", chart_headline="+18.4%", chart_change="Year-over-year growth", chart_labels=["Q1", "Q2", "Q3", "Q4"], chart_values=[12, 15, 17, 18]),
-                Section(dashboard_id=dashboard.id, name="Finance KPIs", chart_type="bar", chart_headline="38.2%", chart_change="Operating margin", chart_labels=["Operating margin", "Gross margin", "EBITDA", "Cash reserve"], chart_values=[38, 62, 29, 71]),
-            ]
-        )
-        db.commit()
+
+with SessionLocal() as startup_db:
+    seed_demo_dashboard(startup_db)
