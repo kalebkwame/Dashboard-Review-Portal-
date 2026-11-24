@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard Review Portal</title>
+  <link rel="stylesheet" href="/static/professional.css">
+  <style>
+    :root { --navy:#17233c; --blue:#3973df; --green:#247b55; --bg:#eef2f7; --white:#fff; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); font-family:Arial,sans-serif; color:#17233c; }
+    .topbar { height:70px; background:var(--navy); color:white; display:flex; align-items:center; justify-content:space-between; padding:0 32px; }
+    .topbar h1 { margin:0; font-size:20px; }
+    .container { max-width:1180px; margin:28px auto; padding:0 20px; }
+    .card { background:var(--white); border:1px solid #d9e1ec; border-radius:12px; padding:20px; box-shadow:0 3px 12px rgba(23,35,60,.06); }
+    .login-card { max-width:420px; margin:70px auto; }
+    label { display:block; margin:12px 0 6px; font-weight:bold; }
+    input, select, textarea, button { font:inherit; }
+    input, select, textarea { width:100%; border:1px solid #bcc7d6; border-radius:7px; padding:11px; }
+    textarea { min-height:76px; resize:vertical; }
+    button { border:0; border-radius:7px; padding:10px 14px; background:var(--blue); color:white; cursor:pointer; font-weight:bold; }
+    button.secondary { background:#68758a; }
+    .hidden { display:none; }
+    .toolbar { display:flex; gap:12px; align-items:center; margin-bottom:18px; }
+    .toolbar select { max-width:360px; }
+    .grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; }
+    .metric { height:180px; border-radius:10px; background:linear-gradient(135deg,#edf3ff,#f8fbff); display:grid; place-items:center; position:relative; overflow:hidden; }
+    .metric::after { content:""; position:absolute; width:75%; height:75%; border-radius:50%; border:18px solid rgba(57,115,223,.18); }
+    .metric strong { z-index:1; font-size:30px; }
+    .section-card h3 { margin-top:0; }
+    .reviews { max-height:180px; overflow:auto; margin:12px 0; }
+    .review { border-top:1px solid #e5eaf1; padding:10px 0; }
+    .status { display:inline-block; font-size:12px; border-radius:999px; padding:4px 8px; background:#edf2f7; }
+    .status.resolved { background:#dcefe6; color:#247b55; }
+    .status.in_progress { background:#fff0c2; color:#805e00; }
+    .error { color:#b42318; min-height:20px; }
+    .success { color:#247b55; min-height:20px; }
+    @media (max-width:900px) { .grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Dashboard Review Portal</h1>
+    <button id="logoutButton" class="secondary hidden">Logout</button>
+  </header>
+
+  <main class="container">
+    <section id="loginView" class="card login-card">
+      <h2 id="authTitle">Sign in</h2>
+      <div id="registerFields" class="hidden">
+        <label>Name</label>
+        <input id="registerName" type="text" placeholder="Your name">
+      </div>
+      <div id="adminSetupFields" class="hidden">
+        <label>Admin setup key</label>
+        <input id="adminSetupKey" type="password" autocomplete="off" placeholder="Exclusive setup key">
+      </div>
+      <label>Email</label>
+      <input id="email" type="email" placeholder="you@example.com">
+      <label>Password</label>
+      <input id="password" type="password" placeholder="Your password">
+      <p id="loginError" class="error"></p>
+      <button id="loginButton">Login</button>
+      <button id="toggleRegisterButton" type="button" class="secondary auth-toggle">Create an account</button>
+      <button id="forgotPasswordButton" type="button" class="text-button">Forgot password?</button>
+    </section>
+
+    <section id="appView" class="hidden">
+      <div class="toolbar">
+        <label style="margin:0">Dashboard</label>
+        <select id="dashboardSelect"></select>
+        <button id="shareButton" class="secondary hidden">Create 24-hour link</button>
+        <button id="createDashboardButton" class="secondary admin-create hidden">New dashboard</button>
+        <button id="createSectionButton" class="secondary admin-create hidden">New section</button>
+        <button id="deleteDashboardButton" class="danger-button hidden">Delete dashboard</button>
+        <button id="manageUsersButton" class="secondary admin-create hidden">Manage users</button>
+        <span id="accountDetails" class="account-details"></span>
+      </div>
+      <form id="dashboardCreateForm" class="admin-form hidden">
+        <h3>Create dashboard</h3>
+        <label>Name</label><input id="newDashboardName" required maxlength="100">
+        <label>Description</label><textarea id="newDashboardDescription" maxlength="1000"></textarea>
+        <button type="submit">Create dashboard</button>
+      </form>
+      <form id="sectionCreateForm" class="admin-form hidden">
+        <h3>Create section</h3>
+        <label>Section name</label><input id="newSectionName" required maxlength="100">
+        <label>Chart type</label><select id="newSectionChart"><option value="bar">Bar</option><option value="line">Line</option><option value="pie">Pie</option></select>
+        <label>Headline</label><input id="newSectionHeadline" maxlength="100">
+        <label>Summary</label><input id="newSectionChange" maxlength="200">
+        <label>Labels (comma separated)</label><input id="newSectionLabels" placeholder="Jan, Feb, Mar">
+        <label>Values (comma separated)</label><input id="newSectionValues" placeholder="12, 18, 24">
+        <button type="submit">Create section</button>
+      </form>
+      <section id="userManagementPanel" class="admin-form hidden">
+        <h3>User roles</h3>
+        <p id="userManagementMessage" class="success"></p>
+        <form id="adminInvitationForm" class="invitation-form">
+          <label>Invite an admin by email</label>
+          <div class="invitation-controls">
+            <input id="adminInvitationEmail" type="email" required placeholder="admin@example.com">
+            <button type="submit">Generate invitation link</button>
+          </div>
+        </form>
+        <div id="adminInvitationResult" class="share-panel hidden"></div>
+        <div id="userList" class="user-list"></div>
+      </section>
+      <p id="shareResult" class="success"></p>
+      <h2 id="dashboardTitle"></h2>
+      <div id="sectionsGrid" class="grid"></div>
+    </section>
+
+    <section id="sectionEditModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="sectionEditTitle">
+      <div class="modal-card">
+        <h3 id="sectionEditTitle">Edit section</h3>
+        <form id="sectionEditForm">
+          <input id="editSectionId" type="hidden">
+          <label>Name</label><input id="editSectionName" required maxlength="100">
+          <label>Chart type</label><select id="editSectionChart"><option value="bar">Bar</option><option value="line">Line</option><option value="pie">Pie</option></select>
+          <label>Headline</label><input id="editSectionHeadline" maxlength="100">
+          <label>Summary</label><input id="editSectionChange" maxlength="200">
+          <label>Labels (comma separated)</label><input id="editSectionLabels">
+          <label>Values (comma separated)</label><input id="editSectionValues">
+          <div class="modal-actions"><button type="button" id="cancelSectionEdit" class="secondary">Cancel</button><button type="submit">Save changes</button></div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

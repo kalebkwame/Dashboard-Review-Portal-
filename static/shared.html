@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shared Dashboard</title>
+  <link rel="stylesheet" href="/static/professional.css">
+  <style>
+    body{margin:0;background:#f4f6fa;color:#17233c;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .shared-header{height:72px;background:#fff;border-bottom:1px solid #dde4ee;display:flex;align-items:center;padding:0 38px}
+    .shared-header h1{margin:0;font-size:18px}.shared-header h1::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;background:#315fbd;margin-right:10px}
+    .shared-container{max-width:1260px;margin:24px auto;padding:0 20px}.shared-description{color:#68758a;margin-top:-8px}.shared-grid{display:grid;grid-template-columns:repeat(3,minmax(0,390px));justify-content:center;gap:14px}.shared-card{background:#fff;border:1px solid #dde4ee;border-radius:10px;padding:22px}.shared-error{padding:40px;text-align:center;color:#b42318}.hidden{display:none}
+    @media(max-width:900px){.shared-grid{grid-template-columns:minmax(0,390px)}}
+  </style>
+</head>
+<body>
+  <header class="shared-header"><h1>Shared Dashboard</h1></header>
+  <main class="shared-container">
+    <h2 id="sharedTitle"></h2>
+    <p id="sharedDescription" class="shared-description"></p>
+    <div id="sharedError" class="shared-error hidden"></div>
+    <div id="sharedGrid" class="shared-grid"></div>
+  </main>
+  <script src="/static/shared.js"></script>
+</body>
+</html>

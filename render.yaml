@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: dashboard-review-portal
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        value: sqlite:///./data/dashboard_review.db
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: ADMIN_SETUP_KEY
+        generateValue: true
+      - key: APP_ORIGIN
+        sync: false
