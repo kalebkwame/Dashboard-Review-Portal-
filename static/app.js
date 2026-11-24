@@ -478,7 +478,7 @@ document.querySelector("#forgotPasswordButton").addEventListener("click", async 
     });
     if (reset) {
       const url = `${window.location.origin}/reset-password/${reset.token}`;
-      error.innerHTML = `Reset link: <a href="${url}" target="_blank">${url}</a>`;
+      error.innerHTML = `<strong>Reset link ready:</strong><br><a class="reset-link" href="${url}" target="_blank" rel="noopener">Open password reset page</a>`;
     } else {
       error.textContent = "If that account exists, a reset link has been generated.";
     }
@@ -487,16 +487,19 @@ document.querySelector("#forgotPasswordButton").addEventListener("click", async 
   }
 });
 
-document.querySelector("#bootstrapAdminButton").addEventListener("click", () => {
-  registering = false;
-  bootstrappingAdmin = true;
-  document.querySelector("#registerFields").classList.remove("hidden");
-  document.querySelector("#adminSetupFields").classList.remove("hidden");
-  document.querySelector("#authTitle").textContent = "Create first admin";
-  document.querySelector("#loginButton").textContent = "Create admin";
-  document.querySelector("#toggleRegisterButton").textContent = "Create an account";
-  document.querySelector("#loginError").textContent = "";
-});
+const bootstrapAdminButton = document.querySelector("#bootstrapAdminButton");
+if (bootstrapAdminButton) {
+  bootstrapAdminButton.addEventListener("click", () => {
+    registering = false;
+    bootstrappingAdmin = true;
+    document.querySelector("#registerFields").classList.remove("hidden");
+    document.querySelector("#adminSetupFields").classList.remove("hidden");
+    document.querySelector("#authTitle").textContent = "Create first admin";
+    document.querySelector("#loginButton").textContent = "Create admin";
+    document.querySelector("#toggleRegisterButton").textContent = "Create an account";
+    document.querySelector("#loginError").textContent = "";
+  });
+}
 
 document.querySelector("#createDashboardButton").addEventListener("click", () => {
   document.querySelector("#dashboardCreateForm").classList.toggle("hidden");
