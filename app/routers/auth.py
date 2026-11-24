@@ -30,6 +30,7 @@ def register(payload: UserCreate, db: Session = Depends(get_db)):
     db.add(user)
     db.commit()
     db.refresh(user)
+    seed_demo_dashboard(db, user)
     return user
 
 
@@ -41,6 +42,8 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
+
+    seed_demo_dashboard(db, user)
 
     token = create_access_token(subject=user.email, role=user.role)
     return {"access_token": token, "token_type": "bearer"}
