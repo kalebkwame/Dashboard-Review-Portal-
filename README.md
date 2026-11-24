@@ -2,21 +2,6 @@
 
 A FastAPI and vanilla-JavaScript dashboard-review demo.
 
-## Demo
-
-- Live deployment: **Add deployed URL here**
-- Walkthrough video: **Add YouTube, Loom, or GitHub-hosted video here**
-- API documentation: `/docs`
-- Health check: `/health`
-
-## Screenshots
-
-```text
-![Dashboard overview](docs/dashboard-overview.png)
-![Role management](docs/user-management.png)
-![Shared dashboard](docs/shared-dashboard.png)
-```
-
 ## Local setup
 
 ```bash
