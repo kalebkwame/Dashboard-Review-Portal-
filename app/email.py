@@ -28,11 +28,11 @@ def send_email(email: str, subject: str, link: str, action: str) -> None:
     try:
         with urlopen(request, timeout=15) as response:
             if response.status not in (200, 201):
-                raise RuntimeError(f"Resend returned HTTP {response.status}")
+                print(f"[EMAIL] Resend rejected HTTP {response.status}")
     except HTTPError as exc:
-        raise RuntimeError(f"Resend rejected the email request: HTTP {exc.code}") from exc
-    except URLError as exc:
-        raise RuntimeError("Could not connect to Resend") from exc
+        print(f"[EMAIL] Resend rejected HTTP {exc.code}")
+    except URLError:
+        print("[EMAIL] Could not connect to Resend")
 
 
 def send_password_reset(email: str, link: str) -> None:
