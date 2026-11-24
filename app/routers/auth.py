@@ -204,7 +204,7 @@ def redeem_admin_invitation(
     return admin
 
 
-@router.post("/password-reset/request", response_model=PasswordResetOut | None)
+@router.post("/password-reset/request")
 def request_password_reset(payload: PasswordResetRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == payload.email).first()
     if not user:
@@ -221,7 +221,7 @@ def request_password_reset(payload: PasswordResetRequest, db: Session = Depends(
     db.refresh(reset)
     origin = os.getenv("APP_ORIGIN", "http://127.0.0.1:8001")
     send_password_reset(user.email, f"{origin.rstrip('/')}/reset-password/{reset.token}")
-    return reset
+    return {"message": "If that account exists, a password reset email has been sent."}
 
 
 @router.post("/password-reset/{token}")

@@ -46,7 +46,8 @@ def test_password_reset_request():
         "email": "test-viewer@example.com"
     })
     assert response.status_code == 200
-    assert "token" in response.json()
+    assert "token" not in response.json()
+    assert "message" in response.json()
 
 
 def test_viewer_cannot_create_dashboard():

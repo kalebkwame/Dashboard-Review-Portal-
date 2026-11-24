@@ -477,10 +477,9 @@ document.querySelector("#forgotPasswordButton").addEventListener("click", async 
       body: JSON.stringify({ email })
     });
     if (reset) {
-      const url = `${window.location.origin}/reset-password/${reset.token}`;
-      error.innerHTML = `<strong>Reset link ready:</strong><br><a class="reset-link" href="${url}" target="_blank" rel="noopener">Open password reset page</a>`;
+      error.textContent = "If that account exists, a password reset email has been sent.";
     } else {
-      error.textContent = "If that account exists, a reset link has been generated.";
+      error.textContent = "If that account exists, a password reset email has been sent.";
     }
   } catch (err) {
     error.textContent = err.message;
@@ -595,9 +594,8 @@ document.querySelector("#adminInvitationForm").addEventListener("submit", async 
       method: "POST",
       body: JSON.stringify({ email })
     });
-    const url = `${window.location.origin}/admin/invite/${invitation.token}`;
     result.classList.remove("hidden");
-    result.innerHTML = `One-time admin link for ${invitation.email}:<br><a href="${url}" target="_blank">${url}</a><br><small>Expires after 24 hours or after first use.</small>`;
+    result.innerHTML = `Admin invitation sent to ${invitation.email}.<br><small>The link expires after 24 hours or after first use.</small>`;
   } catch (err) {
     result.classList.remove("hidden");
     result.textContent = err.message;
