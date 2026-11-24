@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.dashboard_seed import seed_demo_dashboard
 from app.models import AdminInvitation, Dashboard, PasswordReset, User
 from app.schemas import AdminBootstrap, AdminInvitationCreate, AdminInvitationOut, AdminInvitationRedeem, PasswordResetRedeem, PasswordResetRequest, PasswordResetOut, TokenOut, UserCreate, UserLogin, UserOut, UserRoleUpdate
 from app.security import create_access_token, get_current_user, get_password_hash, require_role, verify_password
@@ -99,6 +100,9 @@ def bootstrap_admin(payload: AdminBootstrap, db: Session = Depends(get_db)):
     db.add(admin)
     db.commit()
     db.refresh(admin)
+
+    seed_demo_dashboard(db, admin)  # Seed the Executive Overview dashboard
+
     return admin
 
 
