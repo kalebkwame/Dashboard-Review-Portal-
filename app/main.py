@@ -49,6 +49,9 @@ app.include_router(dashboards_router)
 app.include_router(sharing_router)
 
 
+Base.metadata.create_all(bind=engine)
+
+
 def ensure_review_status_column():
     # Lightweight SQLite-safe schema guard for local development.
     with engine.connect() as connection:
